@@ -36,7 +36,7 @@ bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
-bindsym $mod+d exec dmenu_run -fn pango:pixelsize=15 -b -i -l 10 -p "Command: "
+bindsym $mod+d exec dmenu_run -b
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -166,34 +166,34 @@ bindsym $mod+r mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        position top
+        position bottom
         status_command /home/fmartinez/Repositories/bumblebee-status/bumblebee-status \
-            -t iceberg-powerline \
-            -m xrandr disk load memory weather datetime pulseaudio battery \
-            -p weather.location=Barcelona
+            -m uptime publicip amixer disk load memory battery spacer datetime  \
+            -t iceberg-dark-powerline \
+            -a load disk memory
         i3bar_command i3bar -t
         colors {
-            background #00000077
+            background #000000cc
         }
-        font pango:monospace 15
 }
 
 for_window [class="^.*"] border pixel 0
 focus_follows_mouse no
-exec --no-startup-id feh  --bg-fill ~/Imágenes/ghost_nebula-wallpaper-1920x1080.jpg
+exec --no-startup-id feh  --bg-fill /home/fmartinez/Imágenes/leaves_line_neon_139772_1920x1080.jpg
 exec --no-startup-id compton
 
 bindsym $mod+Escape exec i3lock -c 000000
 bindsym $mod+z exec pass -c github
+bindsym $mod+x exec pass -c vintra/vpn
 
 # Pulse Audio controls
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% #increase sound volume
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% #decrease sound volume
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume `pactl info | grep "Destino predeterminado" | cut -d " " -f3` +5%
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume `pactl info | grep "Destino predeterminado" | cut -d " " -f3` -5%
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute `pactl info | grep "Destino predeterminado" | cut -d " " -f3` toggle
 
 # Sreen brightness controls
-bindsym XF86MonBrightnessUp exec xbacklight -inc 20 # increase screen brightness
-bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightness
+bindsym XF86MonBrightnessUp exec light -A 10 # increase screen brightness
+bindsym XF86MonBrightnessDown exec light -U 10 # decrease screen brightness
 
 # Touchpad controls
 #bindsym XF86TouchpadToggle exec /some/path/toggletouchpad.sh # toggle touchpad
@@ -205,4 +205,18 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 gaps inner 10
-gaps outer 10
+gaps outer 5
+
+exec --no-startup-id nm-applet --sm-disable
+
+border_radius 15
+
+# move workspaces
+bindsym $mod+Control+Left exec i3-msg move workspace to output left
+bindsym $mod+Control+Down exec i3-msg move workspace to output down
+bindsym $mod+Control+Up exec i3-msg move workspace to output up
+bindsym $mod+Control+Right exec i3-msg move workspace to output right
+
+# Shutdown with confirmation
+set $shutdown "shutdown -h now"
+bindsym $mod+Shift+s exec are_you_sure.sh "Really?" $shutdown
